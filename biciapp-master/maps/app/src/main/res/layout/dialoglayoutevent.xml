@@ -6,9 +6,10 @@
     android:padding="20dp"
     android:minWidth="300dp">
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/common_full_open_on_phone"/>
+        android:layout_gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:src="@drawable/bii"/>
 
     <ListView
         android:id="@+id/dialoglist"

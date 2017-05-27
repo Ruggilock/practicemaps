@@ -1,7 +1,10 @@
 package com.example.ruggi.maps;
+
 import android.Manifest;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -9,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -29,24 +33,23 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 
-
-
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnMyLocationButtonClickListener,
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener,
         ActivityCompat.OnRequestPermissionsResultCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private GoogleMap mMap;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private boolean mPermissionDenied = false;
-
+    Context context;
     protected Location mLastLocation;
 
     String KEY_TEXTPSS = "TEXTPSS";
     static final int CUSTOM_DIALOG_ID = 0;
 
     ListView dialog_ListView;
-    String[] listContent={ "Evento1","Evento2","Evento3","Evento4"};
+    String[] listContent = {"Informacion de la app", "Eventos ", "configuracion"};
 
     private GoogleApiClient mGoogleApiClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +58,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        context=this;
 
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -64,10 +68,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .build();
         }
 
-        Button buttonEvento= (Button)findViewById(R.id.bEvent);
+        Button buttonEvento = (Button) findViewById(R.id.bEvent);
         buttonEvento.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
+         //TODO aca es el problema
+          /*
+                Intent intent = new Intent(getContext(), CheeseDetailActivity.class);
+                context.startActivity(intent);
+*/
+
                 showDialog(CUSTOM_DIALOG_ID);
             }
         });
@@ -76,8 +86,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected Dialog onCreateDialog(int id) {
         Dialog dialog = null;
-
-        switch(id) {
+        switch (id) {
             case CUSTOM_DIALOG_ID:
                 dialog = new Dialog(MapsActivity.this);
                 dialog.setContentView(R.layout.dialoglayoutevent);
@@ -86,47 +95,55 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 dialog.setCancelable(true);
                 dialog.setCanceledOnTouchOutside(true);
 
-                dialog.setOnCancelListener(new DialogInterface.OnCancelListener(){
+                dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
 
                     @Override
                     public void onCancel(DialogInterface dialog) {
-                        // TODO Auto-generated method stub
+                       /* // TODO Auto-generated method stub
                         Toast.makeText(MapsActivity.this,
                                 "OnCancelListener",
                                 Toast.LENGTH_LONG).show();
-                    }});
+                    */}});
 
-                dialog.setOnDismissListener(new DialogInterface.OnDismissListener(){
+                dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 
                     @Override
                     public void onDismiss(DialogInterface dialog) {
                         // TODO Auto-generated method stub
-                        Toast.makeText(MapsActivity.this,
+                        /*Toast.makeText(MapsActivity.this,
                                 "OnDismissListener",
                                 Toast.LENGTH_LONG).show();
-                    }});
+                        */
+                    }
+                });
 
                 //Prepare ListView in dialog
-                dialog_ListView = (ListView)dialog.findViewById(R.id.dialoglist);
+                dialog_ListView = (ListView) dialog.findViewById(R.id.dialoglist);
                 ArrayAdapter<String> adapter
                         = new ArrayAdapter<String>(this,
                         android.R.layout.simple_list_item_1, listContent);
                 dialog_ListView.setAdapter(adapter);
-                dialog_ListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+                dialog_ListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view,
                                             int position, long id) {
 
-
-
-
                         // TODO Auto-generated method stub
+
+                        String  val = parent.getItemAtPosition(position).toString();
+                        if ( position==1){
+                            Intent intent = new Intent(context, CheeseDetailActivity.class);
+                            context.startActivity(intent);
+
+                        }
+
                         Toast.makeText(MapsActivity.this,
                                 parent.getItemAtPosition(position).toString() + " clicked",
                                 Toast.LENGTH_LONG).show();
                         dismissDialog(CUSTOM_DIALOG_ID);
-                    }});
+                    }
+                });
 
                 break;
         }
@@ -164,7 +181,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         // Add a marker in Sydney and move the camera
-        LatLng v = new LatLng(-12.07316836,-77.08222121);
+        LatLng v = new LatLng(-12.07316836, -77.08222121);
         mMap.addMarker(new MarkerOptions().position(v).title("Pabellon V").icon(BitmapDescriptorFactory.fromResource(R.drawable.bii)));
 
 
@@ -182,6 +199,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.setMyLocationEnabled(true);
         }
     }
+
     @Override
     public boolean onMyLocationButtonClick() {
         Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT).show();
@@ -190,6 +208,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         return false;
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
